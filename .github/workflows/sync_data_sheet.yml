@@ -1,0 +1,47 @@
+name: Zenduit devices -> billing mapping sheet
+
+on:
+  schedule:
+    - cron: "17 */3 * * *"      # every 3 hours at :17 UTC (off the hour – GitHub delays runs on the hour)
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Report only – do not write to the sheet"
+        type: boolean
+        default: false
+      allow_large_append:
+        description: "Bypass the safety limit for this run only"
+        type: boolean
+        default: false
+
+concurrency:
+  group: billing-mapping-sync     # never two runs at once
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: Append new devices
+        run: python main.py
+        env:
+          ZOHO_CLIENT_ID: ${{ secrets.ZOHO_CLIENT_ID }}
+          ZOHO_CLIENT_SECRET: ${{ secrets.ZOHO_CLIENT_SECRET }}
+          ZOHO_REFRESH_TOKEN: ${{ secrets.ZOHO_REFRESH_TOKEN }}
+          ZOHO_ORG_ID: ${{ secrets.ZOHO_ORG_ID }}
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          DRY_RUN: ${{ inputs.dry_run && '1' || '0' }}
+          ALLOW_LARGE_APPEND: ${{ inputs.allow_large_append && '1' || '0' }}
