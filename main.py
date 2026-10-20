@@ -52,7 +52,7 @@ SOURCE_COLS = {
     "account_name": "Company_Name",
 }
 # Sheet header (row 1 of the Mapping tab), in order
-SHEET_HEADERS = ["Device ID", "Serial", "Account ID", "Customer Name"]
+SHEET_HEADERS = ["Device ID", "Serial", "Internal_crm_account_id", "Internal_account_name"]
 
 SYNC_LOG_HEADERS = ["Started", "Finished", "Status", "New devices added", "Message"]
 NEW_DEVICES_LOG_HEADERS = ["Added at", "Device ID", "Serial", "Account ID", "Customer Name", "Source"]
